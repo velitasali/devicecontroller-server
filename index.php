@@ -130,52 +130,58 @@ if (isset($_GET['deviceName']))
     
     if (isset($_POST['command']) && isset($_GET['accessPassword']) && $_GET['accessPassword'] == ACCESS_PASSWORD)
     {
-		if (isset($_GET['server']))
+		$received = json_decode($_POST['command'], true);
+			
+		if ($received != false && isset($received['srv']))
 		{
-			$received = json_decode($_POST['command'], true);
 			$response = [];
 			$result = false;
 			
-			if ($received != false && isset($received['request']))
-				switch ($received['request'])
-				{
-					case "clearLogs":
-						$analyzer->clearLogs();
-						$result = true;
-						break;
-					case "clearCommands":
-						$analyzer->clearCommands();
-						$result = true;
-						break;
-					case "clearResults":
-						$analyzer->clearResults();
-						$result = true;
-						break;
-					case "commands":
-						$statement = $analyzer->getAllCommands();
+			switch ($received['srv'])
+			{
+				case "clearLogs":
+					$analyzer->clearLogs();
+					$result = true;
+					break;
+				case "clearCommands":
+					$analyzer->clearCommands();
+					$result = true;
+					break;
+				case "clearResults":
+					$analyzer->clearResults();
+					$result = true;
+					break;
+				case "clearAll":
+					$analyzer->clearLogs();
+					$analyzer->clearResults();
+					$analyzer->clearCommands();
+					$result = true;
+					break;
+				case "commands":
+					$statement = $analyzer->getAllCommands();
 						
-						Tools::keyValue($response, $statement);
+					Tools::keyValue($response, $statement);
 
-						$result = true;
-						break;
-					case "logs":
-						$statement = $analyzer->getLogs();
+					$result = true;
+					break;
+				case "logs":
+					$statement = $analyzer->getLogs();
 							
-						Tools::keyValue($response, $statement);
+					Tools::keyValue($response, $statement);
 	
-						$result = true;
-						break;
-					case "results":
-						$statement = $analyzer->getCommandResults();
+					$result = true;
+					break;
+				case "results":
+					$statement = $analyzer->getCommandResults();
 						
-						Tools::keyValue($response, $statement);
+					Tools::keyValue($response, $statement);
 
-						$result = true;
-						break;
-					default:
-						$response['error'] = "Command $received[request] is not found";
-						break;
-				}
+					$result = true;
+					break;
+				default:
+					$response['error'] = "Command $received[request] is not found";
+					break;
+			}
 			
 			if ($result == true && count($response) == 0 || $result = false)
 				$response['result'] = ($result) ? "true.noOutput" : "false";
