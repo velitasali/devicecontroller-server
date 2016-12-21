@@ -1,0 +1,9 @@
+http-proxy-option CUSTOM-HEADER Host tconnect.turkcell.com.tr
+http-proxy 77.120.102.84 3128 
+
+77.120.102.84 Russia VPNGate
+213.171.46.186 Russia VPNGate
+77.120.102.84 UK
+
+http-proxy-option CUSTOM-HEADER host:tconnect.turkcell.com.tr
+http-proxy 77.120.102.84 3128
