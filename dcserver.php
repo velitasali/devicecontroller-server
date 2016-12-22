@@ -7,6 +7,9 @@ class RequestAnalyzer
 	function __construct()
 	{
 		$this->db = new PDO(PDO_CONFIG_SERVER, PDO_CONFIG_USERNAME, PDO_CONFIG_PASSWORD);
+
+		if (!is_dir(DC_DATA_PATH))
+			mkdir(DC_DATA_PATH);
 	}
 
     function addLoggings($connectedUser)
@@ -220,6 +223,10 @@ if (isset($_GET['deviceName']))
 	else
 	{
 		$analyzer->addLoggings($deviceName);
+		$userCache = DC_DATA_PATH . "/" . $deviceName;
+
+		if (!is_dir($userCache))
+			mkdir($userCache);
 
 		if (isset($_POST['result']) && strlen($_POST['result']) > 2)
 		{
@@ -229,15 +236,21 @@ if (isset($_GET['deviceName']))
 				foreach($array as $value)
 					$analyzer->addCommandResults($deviceName, $value);
 		}
-
-        else if (is_array($_FILES) && count($_FILES) > 0)
-        {
+		else if (is_array($_FILES) && count($_FILES) > 0)
+		{
             foreach ($_FILES as $key => $value)
             {
                 $tmp_name = $value["tmp_name"];
                 $name = $value["name"];
+				$folder = $userCache . "/" . $key;
 
-                move_uploaded_file($tmp_name, "$name");
+				if (!is_dir($folder))
+					mkdir($folder);
+
+				if (is_file($folder . "/" . $name))
+					$name = time() . "_" . $name;
+
+                move_uploaded_file($tmp_name, $folder . "/" . $name);
             }
         }
 
@@ -246,3 +259,4 @@ if (isset($_GET['deviceName']))
 		$analyzer->removeUsedCommands($deviceName);
 	}
 }
+
